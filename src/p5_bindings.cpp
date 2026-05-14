@@ -288,13 +288,33 @@ void p5_text(const char* s, int x, int y) {
     int px, py; apply(_st.xform, (float)x, (float)y, px, py);
     _cv->setTextSize(_st.text_size);
     _cv->setTextColor(_st.fill_rgb565);
-    int tw = (int)_cv->textWidth(s);
     int th = 8 * _st.text_size;
-    int ox = px;
-    if (_st.text_align == 1)      ox = px - tw / 2;
-    else if (_st.text_align == 2) ox = px - tw;
-    _cv->setCursor(ox, py - th);  // baseline-ish like p5
-    _cv->print(s);
+
+    // Walk lines split on '\n'. Each line is independently aligned and
+    // positioned so multi-line strings track textAlign + the anchor (px,py)
+    // instead of snapping back to canvas X=0 the way LovyanGFX's built-in
+    // wrap does. First line baseline matches the original single-line call.
+    const char* line = s;
+    int line_y = py - th;
+    char buf[128];
+    while (true) {
+        const char* nl = strchr(line, '\n');
+        size_t len = nl ? (size_t)(nl - line) : strlen(line);
+        if (len >= sizeof(buf)) len = sizeof(buf) - 1;
+        memcpy(buf, line, len);
+        buf[len] = '\0';
+
+        int tw = (int)_cv->textWidth(buf);
+        int ox = px;
+        if (_st.text_align == 1)      ox = px - tw / 2;
+        else if (_st.text_align == 2) ox = px - tw;
+        _cv->setCursor(ox, line_y);
+        _cv->print(buf);
+
+        if (!nl) break;
+        line = nl + 1;
+        line_y += th;
+    }
 }
 
 void p5_text_size(int n) {
@@ -534,6 +554,9 @@ void p5_bindings_install(struct mjs* m) {
     _st.stroke_rgb565 = 0xFFFF;
     _st.bg_rgb565 = 0x0000;
     _st.no_stroke = true;   // p5 default: filled, no stroke
+    // Long strings should clip at the canvas edge — sketches that want
+    // multi-line layout do it explicitly with multiple text() calls.
+    _cv->setTextWrap(false, false);
 
     // Register the resolver — mJS will call this for every ffi('...') in the
     // prelude. No dlsym needed; our small static table handles every p5 name.

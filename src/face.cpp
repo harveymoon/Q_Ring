@@ -395,7 +395,19 @@ void face_set_rotation(uint8_t r) {
     _rotation_auto = false;
 }
 
-void face_set_rotation_auto(bool enable) { _rotation_auto = enable; }
+void face_set_rotation_auto(bool enable) {
+    // Snap the smoothed angle to the current physical orientation when
+    // auto-rotate is (re-)enabled. Without this, _smooth_angle holds whatever
+    // the previous sketch/face left it at and the slew filter takes ~1 second
+    // to reach the true orientation — sketches that call autoRotate() in
+    // setup() visibly start upside-down then flip around as they converge.
+    if (enable && imu_is_ok()) {
+        float ax = imu_get_ax();
+        float ay = imu_get_ay();
+        _smooth_angle = atan2f(ax, -ay) * (180.0f / (float)M_PI) + 90.0f;
+    }
+    _rotation_auto = enable;
+}
 
 void face_set_accent(uint8_t r, uint8_t g, uint8_t b) {
     _accent_r = r; _accent_g = g; _accent_b = b;

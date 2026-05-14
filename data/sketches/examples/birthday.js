@@ -85,4 +85,6 @@ function draw() {
   text("Happy", 120, 45);
   fill(themeR, themeG, themeB);
   text("Birthday!", 120, 63);
+  textSize(20);
+  text("Q", 120, 100);
 }

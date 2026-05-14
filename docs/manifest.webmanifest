@@ -1,0 +1,13 @@
+{
+  "name": "Q-Ring companion",
+  "short_name": "Q-Ring",
+  "description": "Load sketches and control your Q-Ring over USB.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "theme_color": "#5ec8ff",
+  "background_color": "#0a0e14",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
