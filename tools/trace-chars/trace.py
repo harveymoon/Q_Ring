@@ -14,21 +14,25 @@ Tweak THRESHOLD / EPSILON_PCT / MIN_AREA_PCT to trade fidelity for point count.
 Run:  python tools/trace-chars/trace.py
 """
 
+import json
 import os
+import re
 import sys
 import cv2
 import numpy as np
 from PIL import Image
 
 # ── inputs / outputs ────────────────────────────────────────────────────
-REPO       = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-SRC        = r"C:\Users\Harvey\Pictures\Screenshots\Screenshot 2026-05-18 014023.png"
-SKETCH_OUT = os.path.join(REPO, "data", "sketches", "examples", "wo_ai_ni.js")
-DEBUG_DIR  = os.path.join(os.path.dirname(__file__), "debug")
+REPO        = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+SRC         = r"C:\Users\Harvey\Pictures\Screenshots\Screenshot 2026-05-18 014023.png"
+SKETCH_OUT  = os.path.join(REPO, "data", "sketches", "examples", "wo_ai_ni.js")
+DOCS_INDEX  = os.path.join(REPO, "docs", "index.html")
+DEBUG_DIR   = os.path.join(os.path.dirname(__file__), "debug")
+SKETCH_NAME = "wo_ai_ni"   # key under which the sketch appears in the companion dropdown
 
 # ── tuning ──────────────────────────────────────────────────────────────
 THRESHOLD     = 100      # pixel < this → ink (filters faint watermark)
-EPSILON_PCT   = 0.006    # approxPolyDP epsilon as a fraction of perimeter
+EPSILON_PCT   = 0.0025   # approxPolyDP epsilon as a fraction of perimeter
 MIN_AREA_PCT  = 0.005    # drop contours smaller than this fraction of char bbox
 COL_GAP_PX    = 18       # merge runs within this many empty columns
 
@@ -173,75 +177,133 @@ let SCALE = 2.0;        // 0..100 local box → 0..200 screen
 let HALF = 50;
 
 let charIdx = 0;
+let stage = 0;          // 0=ink-outline, 1=hold-line, 2=fade-fill, 3=hold-fill
 let polyIdx = 0;
 let segIdx  = 0;
 let progress = 0;       // 0..1 along current segment
-let SPEED = 0.35;       // segment fraction drawn per frame
 let holdFrames = 0;
-let HOLD_TARGET = 60;   // ~2 s at 30 fps
+let fillFrame  = 0;
+
+let SPEED        = 0.525;   // outline segment fraction per frame
+let HOLD_LINE    = 30;      // frames to admire the colored outline (~1 s)
+let FILL_FRAMES  = 18;      // frames of the fade-to-white animation (~0.6 s)
+let HOLD_FILL    = 45;      // frames to admire the filled white character (~1.5 s)
+let FILL_R = 240;
+let FILL_G = 240;
+let FILL_B = 240;
 
 function setup() {{
-  noAutoRotate();
+  autoRotate();
   _bg(8, 10, 18);
 }}
 
 function draw() {{
   let cur = chars[charIdx];
 
-  // ── character complete: hold then clear + advance ──
-  if (polyIdx >= cur.length) {{
-    holdFrames = holdFrames + 1;
-    if (holdFrames > HOLD_TARGET) {{
-      _bg(8, 10, 18);
-      charIdx = charIdx + 1;
-      if (charIdx >= chars.length) {{ charIdx = 0; }}
-      polyIdx = 0;
+  // ── stage 0: ink the colored outline, one chunk per frame ──
+  if (stage ===0) {{
+    if (polyIdx >= cur.length) {{
+      stage = 1;
+      holdFrames = 0;
+      return;
+    }}
+    let p = cur[polyIdx];
+    let nPts = p.length / 2;
+    if (segIdx >= nPts) {{
+      polyIdx = polyIdx + 1;
       segIdx = 0;
       progress = 0;
+      return;
+    }}
+    let aIdx = segIdx * 2;
+    let bIdx = segIdx + 1;
+    if (bIdx >= nPts) {{ bIdx = 0; }}
+    let bOff = bIdx * 2;
+    let x0 = CX + (p[aIdx]     - HALF) * SCALE;
+    let y0 = CY + (p[aIdx + 1] - HALF) * SCALE;
+    let x1 = CX + (p[bOff]     - HALF) * SCALE;
+    let y1 = CY + (p[bOff + 1] - HALF) * SCALE;
+    let newProg = progress + SPEED;
+    if (newProg > 1) {{ newProg = 1; }}
+    let dx = x1 - x0;
+    let dy = y1 - y0;
+    let px0 = x0 + dx * progress;
+    let py0 = y0 + dy * progress;
+    let px1 = x0 + dx * newProg;
+    let py1 = y0 + dy * newProg;
+    _ska(themeR, themeG, themeB, 240);
+    _sw(2);
+    _ln(px0, py0, px1, py1);
+    progress = newProg;
+    if (progress >= 1) {{
+      segIdx = segIdx + 1;
+      progress = 0;
+    }}
+    return;
+  }}
+
+  // ── stage 1: hold the colored outline ──
+  if (stage ===1) {{
+    holdFrames = holdFrames + 1;
+    if (holdFrames > HOLD_LINE) {{
+      stage = 2;
+      fillFrame = 0;
+    }}
+    return;
+  }}
+
+  // ── stage 2: fade-fill — redraw all outlines with color → white,
+  //    weight 2 → 8 over FILL_FRAMES frames. The fat white stroke
+  //    covers the narrow brush shapes, "filling" them. ──
+  if (stage ===2) {{
+    let t = fillFrame / FILL_FRAMES;
+    if (t > 1) {{ t = 1; }}
+    let r = (themeR + (FILL_R - themeR) * t) | 0;
+    let g = (themeG + (FILL_G - themeG) * t) | 0;
+    let b = (themeB + (FILL_B - themeB) * t) | 0;
+    let w = (2 + 6 * t) | 0;
+    _ska(r, g, b, 240);
+    _sw(w);
+    let pi;
+    for (pi = 0; pi < cur.length; pi = pi + 1) {{
+      let p = cur[pi];
+      let nPts = p.length / 2;
+      let si;
+      for (si = 0; si < nPts; si = si + 1) {{
+        let aIdx = si * 2;
+        let bIdx = si + 1;
+        if (bIdx >= nPts) {{ bIdx = 0; }}
+        let bOff = bIdx * 2;
+        let x0 = CX + (p[aIdx]     - HALF) * SCALE;
+        let y0 = CY + (p[aIdx + 1] - HALF) * SCALE;
+        let x1 = CX + (p[bOff]     - HALF) * SCALE;
+        let y1 = CY + (p[bOff + 1] - HALF) * SCALE;
+        _ln(x0, y0, x1, y1);
+      }}
+    }}
+    fillFrame = fillFrame + 1;
+    if (fillFrame > FILL_FRAMES) {{
+      stage = 3;
       holdFrames = 0;
     }}
     return;
   }}
 
-  let p = cur[polyIdx];
-  let nPts = p.length / 2;
-
-  if (segIdx >= nPts) {{
-    polyIdx = polyIdx + 1;
-    segIdx = 0;
-    progress = 0;
+  // ── stage 3: hold the filled white character, then clear + advance ──
+  if (stage ===3) {{
+    holdFrames = holdFrames + 1;
+    if (holdFrames > HOLD_FILL) {{
+      _bg(8, 10, 18);
+      charIdx = charIdx + 1;
+      if (charIdx >= chars.length) {{ charIdx = 0; }}
+      stage = 0;
+      polyIdx = 0;
+      segIdx = 0;
+      progress = 0;
+      holdFrames = 0;
+      fillFrame = 0;
+    }}
     return;
-  }}
-
-  // current segment: pts[segIdx] → pts[(segIdx+1) mod nPts]  (closed)
-  let aIdx = segIdx * 2;
-  let bIdx = segIdx + 1;
-  if (bIdx >= nPts) {{ bIdx = 0; }}
-  let bOff = bIdx * 2;
-
-  let x0 = CX + (p[aIdx]     - HALF) * SCALE;
-  let y0 = CY + (p[aIdx + 1] - HALF) * SCALE;
-  let x1 = CX + (p[bOff]     - HALF) * SCALE;
-  let y1 = CY + (p[bOff + 1] - HALF) * SCALE;
-
-  let newProg = progress + SPEED;
-  if (newProg > 1) {{ newProg = 1; }}
-
-  let dx = x1 - x0;
-  let dy = y1 - y0;
-  let px0 = x0 + dx * progress;
-  let py0 = y0 + dy * progress;
-  let px1 = x0 + dx * newProg;
-  let py1 = y0 + dy * newProg;
-
-  _ska(themeR, themeG, themeB, 240);
-  _sw(2);
-  _ln(px0, py0, px1, py1);
-
-  progress = newProg;
-  if (progress >= 1) {{
-    segIdx = segIdx + 1;
-    progress = 0;
   }}
 }}
 """
@@ -268,6 +330,53 @@ def write_sketch(chars_data):
     with open(SKETCH_OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(out)
     print(f"Wrote {SKETCH_OUT}  ({len(out)} bytes)")
+
+    update_companion_examples(out)
+
+
+def update_companion_examples(sketch_text):
+    """Add/update SKETCH_NAME in the companion's examples-data JSON block."""
+    if not os.path.exists(DOCS_INDEX):
+        print(f"WARN: {DOCS_INDEX} not found, skipping companion update")
+        return
+
+    with open(DOCS_INDEX, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    pattern = re.compile(
+        r'(<script id="examples-data" type="application/json">)(.*?)(</script>)',
+        re.DOTALL,
+    )
+    m = pattern.search(html)
+    if not m:
+        print(f"ERROR: <script id='examples-data'> block not found in {DOCS_INDEX}")
+        return
+
+    raw = m.group(2).strip()
+    try:
+        examples = json.loads(raw)
+    except json.JSONDecodeError as e:
+        print(f"ERROR: failed to parse examples-data JSON: {e}")
+        return
+
+    existed = SKETCH_NAME in examples
+    examples[SKETCH_NAME] = sketch_text
+
+    # Re-serialize one entry per line so the diff stays small and readable.
+    items = [
+        f"  {json.dumps(k, ensure_ascii=False)}: {json.dumps(v, ensure_ascii=False)}"
+        for k, v in examples.items()
+    ]
+    new_block = "\n" + "{\n" + ",\n".join(items) + "\n}\n"
+    new_html = html[: m.start(2)] + new_block + html[m.end(2):]
+
+    if new_html == html:
+        return  # no change
+
+    with open(DOCS_INDEX, "w", encoding="utf-8", newline="\n") as f:
+        f.write(new_html)
+    verb = "updated" if existed else "added"
+    print(f"Companion examples: {verb} '{SKETCH_NAME}' in {DOCS_INDEX}")
 
 
 if __name__ == "__main__":

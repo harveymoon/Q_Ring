@@ -9,22 +9,22 @@
 // work is essentially one _ln() call — extremely light on the interpreter.
 
 let wo_outlines = [
-  [42.5, 0.0, 49.2, 16.0, 39.9, 13.9, 8.5, 48.5, 8.5, 56.2, 18.3, 62.9, 32.7, 58.8, 31.7, 64.9, 16.8, 73.7, 39.9, 91.8, 38.9, 69.1, 60.6, 52.6, 63.1, 59.8, 46.6, 71.6, 57.0, 73.2, 66.8, 68.6, 78.1, 88.7, 91.0, 99.5, 86.9, 71.1, 83.2, 85.1, 70.4, 63.9, 75.5, 50.5, 67.3, 45.4, 66.8, 54.6, 62.1, 40.7, 68.3, 34.0, 59.5, 29.9, 54.9, 8.2],
-  [52.8, 25.8, 54.4, 31.4, 48.2, 33.5, 46.6, 37.1, 42.0, 38.1, 38.9, 36.1, 31.2, 36.1, 34.8, 40.2, 32.7, 43.8, 13.7, 54.6, 12.1, 54.6, 9.5, 52.1, 9.0, 47.9, 10.6, 45.4, 18.3, 39.2, 33.2, 33.5, 45.6, 26.3],
+  [42.5, 0.0, 43.6, 6.2, 49.2, 16.0, 39.9, 13.9, 39.9, 18.0, 16.2, 38.1, 8.5, 48.5, 8.5, 56.2, 18.3, 62.9, 25.0, 63.4, 32.7, 58.8, 31.7, 64.9, 17.3, 71.1, 16.8, 73.7, 39.9, 91.8, 38.9, 69.1, 60.6, 52.6, 63.1, 59.8, 55.4, 67.5, 46.6, 71.6, 57.0, 73.2, 66.8, 68.6, 78.1, 88.7, 85.3, 96.4, 91.0, 99.5, 86.9, 71.1, 83.2, 85.1, 78.1, 78.9, 70.4, 63.9, 76.5, 56.2, 75.5, 50.5, 67.3, 45.4, 68.8, 51.5, 66.8, 54.6, 62.1, 40.7, 67.8, 37.1, 68.3, 34.0, 59.5, 29.9, 54.9, 8.2, 46.1, 4.1],
+  [52.8, 25.8, 54.4, 31.4, 48.2, 33.5, 46.6, 37.1, 42.0, 38.1, 38.9, 36.1, 31.2, 36.1, 31.2, 37.1, 34.8, 40.2, 34.3, 42.3, 32.7, 43.8, 13.7, 54.6, 12.1, 54.6, 9.5, 52.1, 9.0, 47.9, 10.6, 45.4, 18.3, 39.2, 26.0, 35.6, 33.2, 33.5, 40.5, 29.9, 45.6, 26.3, 49.2, 25.3],
   [56.4, 40.2, 59.5, 49.0, 54.9, 52.6, 39.9, 60.3, 39.4, 55.7, 41.5, 50.5, 48.7, 44.3],
   [65.2, 19.1, 77.6, 26.8, 80.7, 26.3, 82.2, 24.2, 81.7, 20.6, 77.6, 16.5, 72.9, 16.5],
 ];
 
 let ai_outlines = [
-  [55.4, 0.0, 27.2, 16.3, 56.0, 13.6, 59.2, 21.7, 51.1, 33.7, 37.0, 36.4, 39.7, 21.2, 46.2, 32.1, 51.1, 30.4, 52.2, 20.1, 41.8, 18.5, 24.5, 25.0, 29.3, 39.1, 20.1, 44.0, 14.7, 37.5, 13.6, 63.0, 26.1, 44.6, 43.5, 43.5, 25.0, 54.9, 36.4, 60.3, 25.5, 68.5, 30.4, 70.7, 17.9, 92.4, 54.3, 85.3, 70.1, 97.3, 87.5, 98.9, 84.8, 91.8, 57.6, 79.3, 64.1, 63.0, 60.3, 53.8, 42.9, 62.0, 63.0, 45.7, 88.6, 44.0, 81.0, 33.7, 59.2, 33.7, 66.3, 22.3, 57.1, 13.0, 67.9, 8.7],
+  [55.4, 0.0, 46.2, 9.2, 27.2, 16.3, 39.1, 17.4, 56.0, 13.6, 59.2, 21.7, 51.1, 33.7, 37.0, 36.4, 37.0, 26.1, 39.7, 21.2, 42.9, 22.8, 46.2, 32.1, 51.1, 30.4, 52.2, 20.1, 49.5, 21.7, 41.8, 18.5, 31.5, 26.6, 24.5, 25.0, 28.8, 31.5, 29.3, 39.1, 20.1, 44.0, 14.7, 37.5, 15.8, 43.5, 10.9, 52.7, 13.6, 63.0, 26.1, 44.6, 39.7, 41.8, 43.5, 43.5, 41.3, 49.5, 25.0, 54.9, 29.9, 60.9, 36.4, 60.3, 32.6, 66.8, 25.5, 68.5, 30.4, 70.7, 20.1, 83.7, 17.9, 92.4, 23.9, 88.6, 39.1, 92.4, 54.3, 85.3, 70.1, 97.3, 87.5, 98.9, 88.6, 95.7, 84.8, 91.8, 57.6, 79.3, 64.1, 63.0, 60.3, 53.8, 42.9, 62.0, 48.4, 52.7, 63.0, 49.5, 63.0, 45.7, 85.3, 46.2, 88.6, 44.0, 87.5, 38.6, 81.0, 33.7, 59.2, 33.7, 66.3, 22.3, 57.1, 13.0, 67.9, 8.7, 64.1, 3.8],
   [77.7, 37.5, 73.9, 41.3, 63.6, 45.1, 56.0, 44.0, 51.1, 45.7, 50.5, 42.9, 48.4, 40.2, 49.5, 39.1, 71.7, 35.3, 76.1, 35.9],
   [47.3, 78.8, 47.3, 79.9, 44.0, 83.2, 35.3, 88.6, 27.2, 89.1, 25.0, 88.0, 37.5, 73.4, 41.8, 75.0],
   [56.0, 62.5, 55.4, 65.8, 51.1, 73.9, 42.4, 69.6, 53.8, 62.5],
 ];
 
 let ni_outlines = [
-  [46.6, 0.0, 42.2, 3.8, 48.4, 1.9, 52.8, 12.5, 39.1, 46.9, 44.1, 54.4, 51.6, 50.0, 57.8, 63.8, 38.4, 73.8, 32.8, 70.0, 30.3, 83.8, 37.8, 91.2, 44.1, 80.6, 62.8, 99.4, 69.1, 86.2, 69.7, 62.5, 84.1, 68.8, 83.4, 73.8, 76.6, 75.6, 90.3, 85.6, 95.9, 80.6, 96.6, 70.6, 90.9, 63.1, 70.3, 62.5, 67.8, 53.1, 89.7, 36.9, 92.2, 29.4, 79.1, 20.0, 61.6, 26.2, 63.4, 7.5],
-  [20.9, 8.8, 20.9, 17.5, 17.8, 27.5, 10.3, 42.5, 2.8, 50.6, 2.8, 55.6, 7.2, 64.4, 14.1, 61.9, 13.4, 85.6, 18.4, 94.4, 22.8, 96.9, 24.7, 85.6, 24.7, 55.0, 23.4, 58.8, 20.3, 51.2, 34.1, 30.0, 34.7, 23.8],
+  [46.6, 0.0, 42.2, 3.8, 48.4, 1.9, 52.8, 8.1, 52.8, 12.5, 45.3, 32.5, 39.1, 40.6, 39.1, 46.9, 44.1, 54.4, 51.6, 50.0, 57.8, 58.1, 57.8, 63.8, 38.4, 73.8, 35.9, 70.0, 32.8, 70.0, 30.3, 76.9, 30.3, 83.8, 32.8, 88.1, 37.8, 91.2, 44.1, 80.6, 57.8, 96.2, 62.8, 99.4, 67.2, 93.8, 69.1, 86.2, 69.7, 62.5, 77.8, 63.1, 84.1, 68.8, 85.3, 71.9, 83.4, 73.8, 76.6, 74.4, 76.6, 75.6, 90.3, 85.6, 92.2, 85.6, 95.9, 80.6, 96.6, 70.6, 90.9, 63.1, 70.3, 62.5, 67.8, 53.1, 69.7, 50.0, 91.6, 35.0, 92.2, 29.4, 87.8, 24.4, 79.1, 20.0, 61.6, 26.2, 64.7, 15.0, 63.4, 7.5, 54.1, 1.2],
+  [20.9, 8.8, 20.9, 17.5, 17.8, 27.5, 10.3, 42.5, 7.2, 46.9, 2.8, 50.6, 2.8, 55.6, 4.7, 61.2, 7.2, 64.4, 11.6, 63.1, 12.8, 61.2, 14.1, 61.9, 13.4, 85.6, 18.4, 94.4, 20.3, 96.2, 22.8, 96.9, 24.1, 93.8, 24.7, 85.6, 24.7, 55.0, 23.4, 58.8, 22.2, 57.5, 20.3, 51.2, 27.8, 37.5, 34.1, 30.0, 34.7, 23.8, 31.6, 18.8],
   [58.4, 68.8, 59.1, 80.0, 57.8, 82.5, 52.8, 82.5, 45.3, 78.8, 50.9, 72.5, 57.8, 68.1],
   [74.1, 33.8, 70.9, 40.0, 64.7, 46.2, 60.9, 46.9, 57.8, 44.4, 62.2, 39.4, 67.2, 35.6, 72.8, 33.1],
 ];
@@ -37,74 +37,132 @@ let SCALE = 2.0;        // 0..100 local box → 0..200 screen
 let HALF = 50;
 
 let charIdx = 0;
+let stage = 0;          // 0=ink-outline, 1=hold-line, 2=fade-fill, 3=hold-fill
 let polyIdx = 0;
 let segIdx  = 0;
 let progress = 0;       // 0..1 along current segment
-let SPEED = 0.35;       // segment fraction drawn per frame
 let holdFrames = 0;
-let HOLD_TARGET = 60;   // ~2 s at 30 fps
+let fillFrame  = 0;
+
+let SPEED        = 0.525;   // outline segment fraction per frame
+let HOLD_LINE    = 30;      // frames to admire the colored outline (~1 s)
+let FILL_FRAMES  = 18;      // frames of the fade-to-white animation (~0.6 s)
+let HOLD_FILL    = 45;      // frames to admire the filled white character (~1.5 s)
+let FILL_R = 240;
+let FILL_G = 240;
+let FILL_B = 240;
 
 function setup() {
-  noAutoRotate();
+  autoRotate();
   _bg(8, 10, 18);
 }
 
 function draw() {
   let cur = chars[charIdx];
 
-  // ── character complete: hold then clear + advance ──
-  if (polyIdx >= cur.length) {
-    holdFrames = holdFrames + 1;
-    if (holdFrames > HOLD_TARGET) {
-      _bg(8, 10, 18);
-      charIdx = charIdx + 1;
-      if (charIdx >= chars.length) { charIdx = 0; }
-      polyIdx = 0;
+  // ── stage 0: ink the colored outline, one chunk per frame ──
+  if (stage ===0) {
+    if (polyIdx >= cur.length) {
+      stage = 1;
+      holdFrames = 0;
+      return;
+    }
+    let p = cur[polyIdx];
+    let nPts = p.length / 2;
+    if (segIdx >= nPts) {
+      polyIdx = polyIdx + 1;
       segIdx = 0;
       progress = 0;
+      return;
+    }
+    let aIdx = segIdx * 2;
+    let bIdx = segIdx + 1;
+    if (bIdx >= nPts) { bIdx = 0; }
+    let bOff = bIdx * 2;
+    let x0 = CX + (p[aIdx]     - HALF) * SCALE;
+    let y0 = CY + (p[aIdx + 1] - HALF) * SCALE;
+    let x1 = CX + (p[bOff]     - HALF) * SCALE;
+    let y1 = CY + (p[bOff + 1] - HALF) * SCALE;
+    let newProg = progress + SPEED;
+    if (newProg > 1) { newProg = 1; }
+    let dx = x1 - x0;
+    let dy = y1 - y0;
+    let px0 = x0 + dx * progress;
+    let py0 = y0 + dy * progress;
+    let px1 = x0 + dx * newProg;
+    let py1 = y0 + dy * newProg;
+    _ska(themeR, themeG, themeB, 240);
+    _sw(2);
+    _ln(px0, py0, px1, py1);
+    progress = newProg;
+    if (progress >= 1) {
+      segIdx = segIdx + 1;
+      progress = 0;
+    }
+    return;
+  }
+
+  // ── stage 1: hold the colored outline ──
+  if (stage ===1) {
+    holdFrames = holdFrames + 1;
+    if (holdFrames > HOLD_LINE) {
+      stage = 2;
+      fillFrame = 0;
+    }
+    return;
+  }
+
+  // ── stage 2: fade-fill — redraw all outlines with color → white,
+  //    weight 2 → 8 over FILL_FRAMES frames. The fat white stroke
+  //    covers the narrow brush shapes, "filling" them. ──
+  if (stage ===2) {
+    let t = fillFrame / FILL_FRAMES;
+    if (t > 1) { t = 1; }
+    let r = (themeR + (FILL_R - themeR) * t) | 0;
+    let g = (themeG + (FILL_G - themeG) * t) | 0;
+    let b = (themeB + (FILL_B - themeB) * t) | 0;
+    let w = (2 + 6 * t) | 0;
+    _ska(r, g, b, 240);
+    _sw(w);
+    let pi;
+    for (pi = 0; pi < cur.length; pi = pi + 1) {
+      let p = cur[pi];
+      let nPts = p.length / 2;
+      let si;
+      for (si = 0; si < nPts; si = si + 1) {
+        let aIdx = si * 2;
+        let bIdx = si + 1;
+        if (bIdx >= nPts) { bIdx = 0; }
+        let bOff = bIdx * 2;
+        let x0 = CX + (p[aIdx]     - HALF) * SCALE;
+        let y0 = CY + (p[aIdx + 1] - HALF) * SCALE;
+        let x1 = CX + (p[bOff]     - HALF) * SCALE;
+        let y1 = CY + (p[bOff + 1] - HALF) * SCALE;
+        _ln(x0, y0, x1, y1);
+      }
+    }
+    fillFrame = fillFrame + 1;
+    if (fillFrame > FILL_FRAMES) {
+      stage = 3;
       holdFrames = 0;
     }
     return;
   }
 
-  let p = cur[polyIdx];
-  let nPts = p.length / 2;
-
-  if (segIdx >= nPts) {
-    polyIdx = polyIdx + 1;
-    segIdx = 0;
-    progress = 0;
+  // ── stage 3: hold the filled white character, then clear + advance ──
+  if (stage ===3) {
+    holdFrames = holdFrames + 1;
+    if (holdFrames > HOLD_FILL) {
+      _bg(8, 10, 18);
+      charIdx = charIdx + 1;
+      if (charIdx >= chars.length) { charIdx = 0; }
+      stage = 0;
+      polyIdx = 0;
+      segIdx = 0;
+      progress = 0;
+      holdFrames = 0;
+      fillFrame = 0;
+    }
     return;
-  }
-
-  // current segment: pts[segIdx] → pts[(segIdx+1) mod nPts]  (closed)
-  let aIdx = segIdx * 2;
-  let bIdx = segIdx + 1;
-  if (bIdx >= nPts) { bIdx = 0; }
-  let bOff = bIdx * 2;
-
-  let x0 = CX + (p[aIdx]     - HALF) * SCALE;
-  let y0 = CY + (p[aIdx + 1] - HALF) * SCALE;
-  let x1 = CX + (p[bOff]     - HALF) * SCALE;
-  let y1 = CY + (p[bOff + 1] - HALF) * SCALE;
-
-  let newProg = progress + SPEED;
-  if (newProg > 1) { newProg = 1; }
-
-  let dx = x1 - x0;
-  let dy = y1 - y0;
-  let px0 = x0 + dx * progress;
-  let py0 = y0 + dy * progress;
-  let px1 = x0 + dx * newProg;
-  let py1 = y0 + dy * newProg;
-
-  _ska(themeR, themeG, themeB, 240);
-  _sw(2);
-  _ln(px0, py0, px1, py1);
-
-  progress = newProg;
-  if (progress >= 1) {
-    segIdx = segIdx + 1;
-    progress = 0;
   }
 }
